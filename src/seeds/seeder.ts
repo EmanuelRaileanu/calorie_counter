@@ -8,4 +8,5 @@ export async function seed(knex: Knex): Promise<void> {
     await Seed.insertProductionCompanies(Data.productionCompanies);
     await Seed.insertFoods(await Data.foods);
     await Seed.attachCategoriesToFoods(await Data.foodsCategoriesIds); 
+    await Seed.attachCountriesToProductionCompanies(await Data.productionCompaniesCountriesIds);
 };

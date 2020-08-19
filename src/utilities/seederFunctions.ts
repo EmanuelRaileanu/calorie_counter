@@ -21,7 +21,7 @@ export async function insertFoodCategories(foodCategories: string[]): Promise<vo
     }
 }
 
-export async function insertProductionCompanies(productionCompanies: string[]){
+export async function insertProductionCompanies(productionCompanies: string[]): Promise<void>{
     for(const productionCompany of productionCompanies){
         if(!await new ProductionCompany({name: productionCompany}).checkIfAlreadyExists()){
             await new ProductionCompany({name: productionCompany}).save();
@@ -29,7 +29,7 @@ export async function insertProductionCompanies(productionCompanies: string[]){
     }
 }
 
-export async function insertFoods(foods: type.Food[]){
+export async function insertFoods(foods: type.Food[]): Promise<void>{
     for(const food of foods){
         if(!await new Food(food).checkIfAlreadyExists()){
             await new Food(food).save();
@@ -37,24 +37,33 @@ export async function insertFoods(foods: type.Food[]){
     }
 }
 
-async function checkIfCategoryAssociationAlreadyExists(foodRelatedCategories: number[], foodCategoriesIds: number[]){
-    for(const association of foodCategoriesIds){
-        if(foodRelatedCategories.includes(association)){
+async function checkIfAssociatedDataAlreadyExists(relatedDataIds: number[], associations: number[]): Promise<boolean>{
+    for(const association of associations){
+        if(relatedDataIds.includes(association)){
             return true;
         }
     }
     return false;
 }
 
-async function attachCategoriesToFood(foodId: number, foodCategoriesIds: number[]){
-    await new Food({id: foodId}).categories().attach(foodCategoriesIds);
+async function attachNewRelatedDataToModel(model: any, relatedFieldName: string, relatedDataIds: number[]): Promise<void>{
+    await model.related(relatedFieldName).attach(relatedDataIds);
 }
 
-export async function attachCategoriesToFoods(foodsCategoriesIds: {[foodName: string]: number[]}){
-    for(const foodName in foodsCategoriesIds){
+export async function attachCategoriesToFoods(foodsCategoriesIdsDictionary: {[foodName: string]: number[]}): Promise<void>{
+    for(const foodName in foodsCategoriesIdsDictionary){
         const food = await new Food({name: foodName}).fetch({require: false, withRelated: ['categories']});
-        if(!await checkIfCategoryAssociationAlreadyExists(food.related('categories').toJSON().map((c: any) => c.id), foodsCategoriesIds[foodName])){
-            await attachCategoriesToFood(food.get('id'), foodsCategoriesIds[foodName]);
+        if(!await checkIfAssociatedDataAlreadyExists(food.related('categories').toJSON().map((c: any) => c.id), foodsCategoriesIdsDictionary[foodName])){
+            await attachNewRelatedDataToModel(food, 'categories', foodsCategoriesIdsDictionary[foodName]);
+        }
+    }
+}
+
+export async function attachCountriesToProductionCompanies(productionCompaniesCategoriesIdsDictionary: {[companyName: string]: number[]}): Promise<void>{
+    for(const productionCompanyName in productionCompaniesCategoriesIdsDictionary){
+        const productionCompany = await new ProductionCompany({name: productionCompanyName}).fetch({require: false, withRelated: ['countries']});
+        if(!await checkIfAssociatedDataAlreadyExists(productionCompany.related('countries').toJSON().map((p: any) => p.id), productionCompaniesCategoriesIdsDictionary[productionCompanyName])){
+            await attachNewRelatedDataToModel(productionCompany, 'countries', productionCompaniesCategoriesIdsDictionary[productionCompanyName]);
         }
     }
 }

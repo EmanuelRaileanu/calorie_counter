@@ -1,6 +1,5 @@
 import * as oracle from './seederFunctions';
 
-
 class Data{
     static productionCompaniesArray = ['Food and stuff', 'Nestle', 'Heinz', 'Danone', 'Pizza Hut'];
     static countriesArray = ['USA', 'UK', 'China', 'Japan', 'Italy', 'Germany', 'Spain', 'Romania', 'Canada', 'Sweden'];
@@ -58,6 +57,7 @@ class Data{
             countryId: await oracle.getCountryId('USA')
         }
     ];
+
     static foodsCategoriesIdsDictionary = async () => {
         return {
             'Banana': [await oracle.getFoodCategoryId('Fruits')],
@@ -65,6 +65,16 @@ class Data{
             'Natural Yogurt': [await oracle.getFoodCategoryId('Dairy')],
             'Pepperoni Pizza': [await oracle.getFoodCategoryId('Vegetables'), await oracle.getFoodCategoryId('Dairy'), 
                                 await oracle.getFoodCategoryId('Meat'), await oracle.getFoodCategoryId('Grains')]
+        };
+    };
+
+    static productionCompaniesCountriesIdsDictionary = async () => {
+        return {
+            'Food and Stuff': [await oracle.getCountryId('USA'), await oracle.getCountryId('Spain')],
+            'Nestle': [await oracle.getCountryId('USA'), await oracle.getCountryId('UK')],
+            'Heinz': [await oracle.getCountryId('Germany')],
+            'Danone': [await oracle.getCountryId('USA')],
+            'Pizza Hut': [await oracle.getCountryId('USA'), await oracle.getCountryId('Romania')]
         };
     };
 
@@ -86,6 +96,10 @@ class Data{
 
     static get foodsCategoriesIds(){
         return this.foodsCategoriesIdsDictionary();
+    }
+
+    static get productionCompaniesCountriesIds(){
+        return this.productionCompaniesCountriesIdsDictionary();
     }
 }
 
