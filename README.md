@@ -1,1 +1,1 @@
-# calorie_counter
+# calories_counter
