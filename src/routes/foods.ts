@@ -4,4 +4,5 @@ import asyncMiddleware from '../utilities/asyncMiddleware';
 
 export const register = (router: express.Router) => {
     router.get('/foods', asyncMiddleware(controller.getFoods));
+    router.get('/foods/:name', asyncMiddleware(controller.getFoodByName));
 };

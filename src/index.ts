@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import * as root from './routes/root';
 import * as err from './routes/err';
+import * as foods from './routes/foods';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
 root.register(apiRouter);
+foods.register(apiRouter);
 
 err.register(app);
 
