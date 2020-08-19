@@ -3,7 +3,6 @@ import FoodCategory from '../entities/foodCategoriesModel';
 import Country from '../entities/countriesModel';
 import ProductionCompany from '../entities/productionCompaniesModel';
 import * as type from './customTypes';
-import { ok } from 'assert';
 
 export async function insertCountries(countries: string[]): Promise<void>{
     for(const country of countries){
