@@ -6,7 +6,10 @@ export interface Food{
     carbohydratesPer100Grams: number,
     fatPer100Grams: number,
     fiberPer100Grams: number,
-    produtionCompanyId?: number,
+    categories?: string[],
+    productionCompanyId?: number,
+    productionCompanyName?: string,
     countryId?: number,
+    countryName?: string,
     pictureId?: number
 };

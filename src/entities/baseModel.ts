@@ -6,7 +6,11 @@ class BaseModel extends bookshelf.Model<any>{
     }
 
     getId(trx: any = null){
-        return this.fetch({require: false, transacting: trx}).get('id');
+        const element = this.fetch({require: false, transacting: trx});
+        if(element){
+            return element.get('id');
+        }
+        return null;
     }
 };
 
