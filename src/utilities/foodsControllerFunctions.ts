@@ -14,14 +14,14 @@ const deleteFile = util.promisify(fs.unlink);
 export async function fetchFoods(){
     return await new Food().fetchAll({
         require: false, 
-        withRelated: ['categories', 'producedIn', 'producedBy']
+        withRelated: ['categories', 'producedIn', 'producedBy', 'picture']
     });
 };
 
 export async function fetchFoodById(id: number){
     return await new Food({id}).fetch({
         require: false,
-        withRelated: ['categories', 'producedIn', 'producedBy']
+        withRelated: ['categories', 'producedIn', 'producedBy', 'picture']
     });
 };
 
@@ -32,7 +32,7 @@ export async function fetchFoodCategories(){
 export async function fetchFoodByName(name: string){
     return await new Food({name}).fetch({
         require: false,
-        withRelated: ['categories', 'producedIn', 'producedBy']
+        withRelated: ['categories', 'producedIn', 'producedBy', 'picture']
     });
 };
 

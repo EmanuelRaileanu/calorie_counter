@@ -20,7 +20,7 @@ export async function fetchProductionCompanyById(id: number){
     }).fetch({require: false});
 };
 
-export async function saveProductionCompany(body: type.productionCompany){
+export async function saveProductionCompany(body: type.ProductionCompany){
     const productionCompany = await new ProductionCompany(body).save();
     return productionCompany.get('id');
 };

@@ -14,7 +14,17 @@ export interface Food{
     pictureId?: number
 };
 
-export interface productionCompany{
+export interface ProductionCompany{
     id?: number,
     name: string
+};
+
+export interface User{
+    id?: number,
+    name?: string,
+    email: string,
+    dateOfBirth?: string,
+    password: string,
+    confirmPassword?: string,
+    bearerToken?: string
 };

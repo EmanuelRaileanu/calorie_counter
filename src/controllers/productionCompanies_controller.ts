@@ -1,5 +1,4 @@
 import express from 'express';
-import ProductionCompany from '../entities/productionCompaniesModel';
 import * as db from '../utilities/productionCompaniesControllerFunctions';
 import * as handler from '../utilities/exceptionHandlers';
 

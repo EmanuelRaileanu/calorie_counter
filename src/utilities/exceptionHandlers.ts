@@ -1,10 +1,12 @@
 import express from 'express';
 import Food from "../entities/foodsModel";
 import Country from "../entities/countriesModel";
-import ProductionCompany from "../entities/productionCompaniesModel";
+import ProductionCompany from '../entities/productionCompaniesModel';
+import User from '../entities/usersModel';
 import util from 'util';
 import fs from 'fs';
 import * as type from './customTypes';
+import bcrypt from 'bcrypt';
 
 const deleteFile = util.promisify(fs.unlink);
 
@@ -60,7 +62,7 @@ export async function handleFoodDeletionExceptions(req: express.Request){
 };
 
 
-export async function handleGettingProductionCompanyByIdExceptions(productionCompany: type.productionCompany){
+export async function handleGettingProductionCompanyByIdExceptions(productionCompany: type.ProductionCompany){
     if(!productionCompany){
         throw 'Production company not found.';
     }
@@ -81,5 +83,46 @@ export async function handleProductionCompanyUpdateExceptions(req: express.Reque
 export async function handleProductionCompanyDeletionExceptions(req: express.Request){
     if(!await new ProductionCompany({id: req.params.id}).checkIfAlreadyExists()){
         throw `The production company with the id ${req.params.id} cannot be deleted because it does not exist!`;
+    }
+};
+
+async function checkEmail(email: string){
+    if(!email){
+        throw 'Please enter your email.';
+    }else if(!email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)){
+        throw 'Invalid email format. Example format: emailaddress@gmail.com';
+    }
+};
+
+export async function handleRegisterExceptions(req: express.Request){
+    await checkEmail(req.body.email);
+    if(await new User({email: req.body.email}).checkIfAlreadyExists()){
+        throw 'An user with this email address alredy exists.';
+    }else if(!req.body.name){
+        throw 'Please enter your name.';
+    }else if(!req.body.password){
+        throw 'Please enter your password.';
+    }else if(!req.body.confirmPassword){
+        throw 'Please confirm your password.';
+    }else if(req.body.password.length < 6){
+        throw 'The password should be at least 6 characters long.';
+    }else if(req.body.password !== req.body.confirmPassword){
+        throw 'Passwords do not match.';
+    }else if(!req.body.dateOfBirth){
+        throw 'Please enter your date of birth.';
+    }else if(!req.body.dateOfBirth.match(/^\d{4}([-])\d{2}\1\d{2}$/)){
+        throw 'Incorrect date format. Hint: YYYY-MM-DD';
+    }
+};
+
+export async function handleLoginExceptions(req: express.Request){
+    await checkEmail(req.body.email);
+    const user = await new User({email: req.body.email}).fetch({require: false});
+    if(!req.body.password){
+        throw 'Please enter your password.';
+    }else if(!await bcrypt.compare(req.body.password, user.get('password'))){
+        throw 'Incorrect password';
+    }else if(user.get('bearerToken')){
+        throw user.get('bearerToken');
     }
 };
