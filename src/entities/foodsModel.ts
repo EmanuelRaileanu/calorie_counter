@@ -2,6 +2,7 @@ import BaseModel from './baseModel';
 import FoodCategory from './foodCategoriesModel';
 import Country from './countriesModel';
 import ProductionCompany from './productionCompaniesModel';
+import File from './filesModel';
 
 class Food extends BaseModel{
     get tableName(){
@@ -18,6 +19,10 @@ class Food extends BaseModel{
 
     producedBy(){
         return this.belongsTo(ProductionCompany, 'productionCompanyId', 'id');
+    }
+
+    picture(){
+        return this.hasOne(File, 'id', 'pictureId');
     }
 };
 

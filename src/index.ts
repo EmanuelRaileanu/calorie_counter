@@ -3,6 +3,10 @@ import dotenv from 'dotenv';
 import * as root from './routes/root';
 import * as err from './routes/err';
 import * as foods from './routes/foods';
+import * as productionCompanies from './routes/productionCompanies';
+import * as auth from './routes/auth';
+import passport from 'passport';
+import * as authentication from './utilities/authMiddleware';
 
 dotenv.config();
 
@@ -10,13 +14,20 @@ const app = express();
 const port = process.env.SERVER_PORT;
 
 app.use(express.json());
+app.use('/public', express.static('public'));
+
+authentication.configurePassportHttpBearer();
 
 const apiRouter = express.Router();
+const authRouter = express.Router();
 
-app.use('/api', apiRouter);
-
+app.use('/api', passport.authenticate('bearer', {session: false}), apiRouter);
 root.register(apiRouter);
 foods.register(apiRouter);
+productionCompanies.register(apiRouter);
+
+app.use('/auth', authRouter);
+auth.register(authRouter);
 
 err.register(app);
 

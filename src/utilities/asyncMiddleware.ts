@@ -5,9 +5,7 @@ const asyncMiddleware = (fn: any) =>
     try {
         await Promise.resolve(fn(req, res));
     }catch(err){
-        res.status(500).json({
-            status: err.toString()
-        });
+        res.status(500).json(err.toString());
     }
 };
 
