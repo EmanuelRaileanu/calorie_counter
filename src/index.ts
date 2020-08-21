@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import * as root from './routes/root';
 import * as err from './routes/err';
 import * as foods from './routes/foods';
+import * as productionCompanies from './routes/productionCompanies';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use('/api', apiRouter);
 
 root.register(apiRouter);
 foods.register(apiRouter);
+productionCompanies.register(apiRouter);
 
 err.register(app);
 

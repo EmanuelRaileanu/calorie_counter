@@ -1,11 +1,15 @@
 import express from 'express';
-import * as db from '../utilities/controllerFunctions';
+import * as db from '../utilities/foodsControllerFunctions';
 import * as handler from '../utilities/exceptionHandlers';
-import asyncMiddleware from '../utilities/asyncMiddleware';
 
 export const getFoods = async (req: express.Request, res: express.Response) => {
     const foods = await db.fetchFoods();
     res.json(foods);
+};
+
+export const getFoodCategories = async (req: express.Request, res: express.Response) => {
+    const foodCategories = await db.fetchFoodCategories();
+    res.json(foodCategories);
 };
 
 export const getFoodByName = async (req: express.Request, res: express.Response) => {

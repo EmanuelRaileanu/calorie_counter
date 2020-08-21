@@ -25,6 +25,10 @@ export async function fetchFoodById(id: number){
     });
 };
 
+export async function fetchFoodCategories(){
+    return await new FoodCategory().fetchAll({require: false});
+};
+
 export async function fetchFoodByName(name: string){
     return await new Food({name}).fetch({
         require: false,
@@ -131,3 +135,4 @@ export async function deleteFoodItem(id: number){
         }
     });
 };
+

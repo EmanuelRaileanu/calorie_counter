@@ -13,3 +13,8 @@ export interface Food{
     country?: string,
     pictureId?: number
 };
+
+export interface productionCompany{
+    id?: number,
+    name: string
+};

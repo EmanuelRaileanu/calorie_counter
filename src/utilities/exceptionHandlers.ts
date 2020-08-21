@@ -1,14 +1,14 @@
 import express from 'express';
 import Food from "../entities/foodsModel";
-import * as type from './customTypes';
 import Country from "../entities/countriesModel";
 import ProductionCompany from "../entities/productionCompaniesModel";
 import util from 'util';
 import fs from 'fs';
+import * as type from './customTypes';
 
 const deleteFile = util.promisify(fs.unlink);
 
-export async function handleGettingFoodByNameExceptions(item: any){
+export async function handleGettingFoodByNameExceptions(item: type.Food){
     if(!item){
         throw 'Food item not found.';
     }
@@ -55,6 +55,31 @@ export async function handleFoodUpdateExceptions(req: express.Request){
 
 export async function handleFoodDeletionExceptions(req: express.Request){
     if(!await new Food({id: req.params.id}).checkIfAlreadyExists()){
-        throw 'The food item cannot be deleted because it does not exist!';
+        throw `The food item with the id ${req.params.id} cannot be deleted because it does not exist!`;
+    }
+};
+
+
+export async function handleGettingProductionCompanyByIdExceptions(productionCompany: type.productionCompany){
+    if(!productionCompany){
+        throw 'Production company not found.';
+    }
+};
+
+export async function handleProductionCompanyPostingExceptions(req: express.Request){
+    if(!req.body.name){
+        throw 'Bad request. Please specify a name.';
+    }
+};
+
+export async function handleProductionCompanyUpdateExceptions(req: express.Request){
+    if(!await new ProductionCompany({id: req.params.id}).checkIfAlreadyExists()){
+        throw `The production company with the id ${req.params.id} cannot be updated because it does not exist!`;
+    }
+};
+
+export async function handleProductionCompanyDeletionExceptions(req: express.Request){
+    if(!await new ProductionCompany({id: req.params.id}).checkIfAlreadyExists()){
+        throw `The production company with the id ${req.params.id} cannot be deleted because it does not exist!`;
     }
 };
