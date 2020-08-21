@@ -1,7 +1,6 @@
 import BaseModel from './baseModel';
 import Food from './foodsModel';
 import absoluteUrl from '../utilities/absoluteUrlConfig';
-import abosoluteUrl from '../utilities/absoluteUrlConfig';
 
 class File extends BaseModel{
     get tableName(){
@@ -14,7 +13,7 @@ class File extends BaseModel{
 
     virtuals: any = {
         url(){
-            return abosoluteUrl + this.get('relativePath');
+            return absoluteUrl + this.get('relativePath');
         }
     }
 };
