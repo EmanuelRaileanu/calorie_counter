@@ -15,7 +15,7 @@ export const getFoodByName = async (req: express.Request, res: express.Response)
 };
 
 export const postFood = async (req: express.Request, res: express.Response) => {
-    await handler.handleFoodPostingExceptions(req.body);
+    await handler.handleFoodPostingExceptions(req);
     const id = await db.saveFoodItem(req);
     const newFoodItem = await db.fetchFoodById(id);
     res.json(newFoodItem);

@@ -8,8 +8,8 @@ export interface Food{
     fiberPer100Grams: number,
     categories?: string[],
     productionCompanyId?: number,
-    productionCompanyName?: string,
+    productionCompany?: string,
     countryId?: number,
-    countryName?: string,
+    country?: string,
     pictureId?: number
 };
