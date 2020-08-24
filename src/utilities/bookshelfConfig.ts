@@ -1,5 +1,5 @@
-import Knex from 'knex';
 import Bookshelf from 'bookshelf';
+import Knex from 'knex';
 const config = require('../../knexfile');
 
 const knex = Knex(config.development);

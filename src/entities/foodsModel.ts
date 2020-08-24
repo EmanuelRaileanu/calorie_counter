@@ -3,6 +3,7 @@ import FoodCategory from './foodCategoriesModel';
 import Country from './countriesModel';
 import ProductionCompany from './productionCompaniesModel';
 import File from './filesModel';
+import User from './usersModel';
 
 class Food extends BaseModel{
     get tableName(){
@@ -23,6 +24,10 @@ class Food extends BaseModel{
 
     picture(){
         return this.hasOne(File, 'id', 'pictureId');
+    }
+
+    users(){
+        return this.belongsToMany(User, 'users_foods', 'foodId', 'userId');
     }
 };
 

@@ -1,4 +1,4 @@
-import bookshelf from '../utilities/bookshelfconfig';
+import bookshelf from '../utilities/bookshelfConfig';
 
 class BaseModel extends bookshelf.Model<any>{
     checkIfAlreadyExists(trx: any = null){
