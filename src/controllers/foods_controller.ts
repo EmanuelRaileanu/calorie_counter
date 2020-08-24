@@ -12,6 +12,10 @@ export const getFoodCategories = async (req: express.Request, res: express.Respo
     res.json(foodCategories);
 };
 
+export const getUserProfile = async (req: any, res: express.Response) => {
+    res.json(req.user);
+};
+
 export const getFoodByName = async (req: express.Request, res: express.Response) => {
     const food = await db.fetchFoodByName(req.params.name);
     await handler.handleGettingFoodByNameExceptions(food);
@@ -25,6 +29,12 @@ export const postFood = async (req: express.Request, res: express.Response) => {
     res.json(newFoodItem);
 };
 
+export const addUserRelatedFoods = async (req:express.Request, res: express.Response) => {
+    await handler.handleAddingUserRelatedFoodsExceptions(req);
+    await db.attachUserFoods(req);
+    res.json('Foods saved.');
+};
+
 export const putFood = async (req: express.Request, res: express.Response) => {
     await handler.handleFoodUpdateExceptions(req);
     await db.updateFoodItem(req);
@@ -35,5 +45,10 @@ export const putFood = async (req: express.Request, res: express.Response) => {
 export const deleteFood = async (req: express.Request, res: express.Response) => {
     await handler.handleFoodDeletionExceptions(req);
     await db.deleteFoodItem(parseInt(req.params.id));
+    res.status(204).send();
+};
+
+export const deleteUserRelatedFoods = async (req: express.Request, res: express.Response) => {
+    await db.detachUserRelatedFoods(req);
     res.status(204).send();
 };

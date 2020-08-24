@@ -1,5 +1,5 @@
 import express from 'express';
-import bookshelf from './bookshelfconfig';
+import bookshelf from './bookshelfConfig';
 import * as type from './customTypes';
 import Food from '../entities/foodsModel';
 import ProductionCompany from '../entities/productionCompaniesModel';
@@ -8,6 +8,7 @@ import FoodCategory from '../entities/foodCategoriesModel';
 import File from '../entities/filesModel';
 import util from 'util';
 import fs from 'fs';
+import User from '../entities/usersModel';
 
 const deleteFile = util.promisify(fs.unlink);
 
@@ -103,6 +104,38 @@ export async function saveFoodItem(req: express.Request){
     });
 };
 
+async function getUserRelatedFoodsIds(userId: number, trx: any){
+    const user = await new User({id: userId}).fetch({require: false, transacting: trx, withRelated:['foods']})
+    const foodsIds = user.related('foods').toJSON().map((food: any) => food.id);
+    return foodsIds;
+};
+
+async function checkIfUserFoodAlreadyExists(food: any, trx: any){
+    const user = await new User({id: food.userId}).fetch({require: false, transacting: trx, withRelated: ['foods']});
+    const foodsIds = user.related('foods').map((food: any) => food.id);
+    if(foodsIds.find((foodId: any) => foodId === food.foodId)){
+        return true;
+    }
+    return false;
+};
+
+export async function attachUserFoods(req: any){
+    await bookshelf.transaction(async trx => {
+        const userId = req.user.id;
+        for(const food of req.body.foods){
+            food.userId = userId;
+            food.foodId = await new Food({name: food.name}).getId(trx);
+            delete food.name;
+            if(await checkIfUserFoodAlreadyExists(food, trx)){
+                const oldGrams = (await bookshelf.knex('users_foods').where({userId, foodId: food.foodId}).select('grams').first()).grams;
+                await bookshelf.knex('users_foods').where({userId, foodId: food.foodId}).update({grams: oldGrams + food.grams});
+            }else{
+                await bookshelf.knex('users_foods').insert(food);
+            }
+        }
+    });
+};
+
 export async function updateFoodItem(req: express.Request){
     await bookshelf.transaction(async trx => {
         const id = req.params.id;
@@ -133,6 +166,13 @@ export async function deleteFoodItem(id: number){
         if(oldPhotoPath){
             await deleteOldFile(pictureId, oldPhotoPath, trx);
         }
+    });
+};
+
+export async function detachUserRelatedFoods(req: any){
+    await bookshelf.transaction(async trx => {
+        const foodsIds = await getUserRelatedFoodsIds(req.user.id, trx);
+        await new User({id: req.user.id}).foods().detach(foodsIds, {transacting: trx});
     });
 };
 

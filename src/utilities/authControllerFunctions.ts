@@ -1,9 +1,12 @@
-import express from 'express';
 import User from '../entities/usersModel';
 import * as type from './customTypes';
-import bookshelf from './bookshelfconfig';
+import bookshelf from './bookshelfConfig';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
+import transporter from './mailConfig';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export async function saveUser(body: type.User){
     const salt = await bcrypt.genSalt(10);
@@ -30,3 +33,23 @@ export async function destroyBearerToken(bearerToken: string){
     await new User().where({bearerToken}).save({bearerToken: null}, {method: 'update'});
 };
 
+export async function sendPasswordResetEmail(email: string){
+    const passwordResetToken = crypto.randomBytes(20).toString('hex');;
+    await new User().where({email}).save({passwordResetToken}, {method: 'update'});
+    await transporter.sendMail({
+        from: process.env.EMAIL_ADDRESS,
+        to: email,
+        subject: 'Password reset',
+        text: `To change your password please access ${process.env.API_URL}:${process.env.SERVER_PORT}/auth/change-password/?passwordResetToken=${passwordResetToken}.`
+    });
+};
+
+export async function changePassword(req: any){
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    if(req.query.passwordResetToken){
+        await new User().where({passwordResetToken: req.query.passwordResetToken}).save({password: hashedPassword, passwordResetToken: null}, {method: 'update'});
+    }else{
+        await new User().where({bearerToken: req.user.bearerToken}).save({password: hashedPassword, passwordResetToken: null}, {method: 'update'});
+    }
+};

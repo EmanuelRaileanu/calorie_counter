@@ -1,11 +1,11 @@
 import * as oracle from './seederFunctions';
 
 class Data{
-    static productionCompaniesArray = ['Food and stuff', 'Nestle', 'Heinz', 'Danone', 'Pizza Hut'];
-    static countriesArray = ['USA', 'UK', 'China', 'Japan', 'Italy', 'Germany', 'Spain', 'Romania', 'Canada', 'Sweden'];
-    static foodCategoriesArray = ['Vegetables', 'Fruits', 'Grains', 'Beans', 'Nuts', 'Meat', 'Fish', 
+    private static productionCompaniesArray = ['Food and stuff', 'Nestle', 'Heinz', 'Danone', 'Pizza Hut'];
+    private static countriesArray = ['USA', 'UK', 'China', 'Japan', 'Italy', 'Germany', 'Spain', 'Romania', 'Canada', 'Sweden'];
+    private static foodCategoriesArray = ['Vegetables', 'Fruits', 'Grains', 'Beans', 'Nuts', 'Meat', 'Fish', 
                                     'Seafood', 'Dairy', 'Eggs', 'Non-alcoholic beverage', 'Alcoholic beverage'];                               
-    static foodsArray = async () => [
+    private static foodsArray = async () => [
         {
             name: 'Banana',
             caloriesPer100Grams: 89,
@@ -58,7 +58,7 @@ class Data{
         }
     ];
 
-    static foodsCategoriesIdsDictionary = async () => {
+    private static foodsCategoriesIdsDictionary = async () => {
         return {
             'Banana': [await oracle.getFoodCategoryId('Fruits')],
             'Scrambled Eggs': [await oracle.getFoodCategoryId('Eggs')],
@@ -68,7 +68,7 @@ class Data{
         };
     };
 
-    static productionCompaniesCountriesIdsDictionary = async () => {
+    private static productionCompaniesCountriesIdsDictionary = async () => {
         return {
             'Food and Stuff': [await oracle.getCountryId('USA'), await oracle.getCountryId('Spain')],
             'Nestle': [await oracle.getCountryId('USA'), await oracle.getCountryId('UK')],

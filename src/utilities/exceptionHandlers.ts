@@ -94,20 +94,26 @@ async function checkEmail(email: string){
     }
 };
 
+async function checkPasswords(password: any, confirmPassword: any){
+    if(!password){
+        throw 'Please enter your password.';
+    }else if(!confirmPassword){
+        throw 'Please confirm your password.';
+    }else if(password.length < 6){
+        throw 'The password should be at least 6 characters long.';
+    }else if(password !== confirmPassword){
+        throw 'Passwords do not match.';
+    }
+};
+
 export async function handleRegisterExceptions(req: express.Request){
     await checkEmail(req.body.email);
     if(await new User({email: req.body.email}).checkIfAlreadyExists()){
         throw 'An user with this email address alredy exists.';
-    }else if(!req.body.name){
+    }
+    await checkPasswords(req.body.password, req.body.confirmPassword);
+    if(!req.body.name){
         throw 'Please enter your name.';
-    }else if(!req.body.password){
-        throw 'Please enter your password.';
-    }else if(!req.body.confirmPassword){
-        throw 'Please confirm your password.';
-    }else if(req.body.password.length < 6){
-        throw 'The password should be at least 6 characters long.';
-    }else if(req.body.password !== req.body.confirmPassword){
-        throw 'Passwords do not match.';
     }else if(!req.body.dateOfBirth){
         throw 'Please enter your date of birth.';
     }else if(!req.body.dateOfBirth.match(/^\d{4}([-])\d{2}\1\d{2}$/)){
@@ -125,4 +131,27 @@ export async function handleLoginExceptions(req: express.Request){
     }else if(user.get('bearerToken')){
         throw user.get('bearerToken');
     }
+};
+
+export async function handleAddingUserRelatedFoodsExceptions(req: express.Request){
+    if(!req.body.foods){
+        throw 'Bad request. Please enter the foods you would like to add to the list.';
+    }
+};
+
+export async function handlePasswordResetExceptions(req: express.Request){
+    await checkEmail(req.params.email);
+    if(!await new User({email: req.params.email}).checkIfAlreadyExists()){
+        throw 'Incorrect email address.';
+    }
+};
+
+export async function handlePasswordChangeExceptions(req: any){
+    if(req.query.passwordResetToken && !await new User({passwordResetToken: req.query.passwordResetToken}).checkIfAlreadyExists()){
+        throw 'Invalid password reset token.';
+    }
+    if(req.user && !await new User({bearerToken: req.user.bearerToken}).checkIfAlreadyExists()){
+        throw 'Unauthorized';
+    }
+    await checkPasswords(req.body.password, req.body.confirmPassword);
 };

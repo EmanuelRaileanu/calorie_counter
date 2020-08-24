@@ -26,5 +26,6 @@ export interface User{
     dateOfBirth?: string,
     password: string,
     confirmPassword?: string,
-    bearerToken?: string
+    bearerToken?: string,
+    passwordResetToken?: string
 };
