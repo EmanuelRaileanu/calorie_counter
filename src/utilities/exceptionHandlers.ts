@@ -94,7 +94,7 @@ async function checkEmail(email: string){
     }
 };
 
-async function checkPasswords(password: any, confirmPassword: any){
+async function checkPasswords(password: string, confirmPassword: string){
     if(!password){
         throw 'Please enter your password.';
     }else if(!confirmPassword){
@@ -146,11 +146,11 @@ export async function handlePasswordResetExceptions(req: express.Request){
     }
 };
 
-export async function handlePasswordChangeExceptions(req: any){
+export async function handlePasswordChangeExceptions(req: express.Request){
     if(req.query.passwordResetToken && !await new User({passwordResetToken: req.query.passwordResetToken}).checkIfAlreadyExists()){
         throw 'Invalid password reset token.';
     }
-    if(req.user && !await new User({bearerToken: req.user.bearerToken}).checkIfAlreadyExists()){
+    if(req.headers.authorization && !await new User({bearerToken: req.headers.authorization?.split(' ')[1]}).checkIfAlreadyExists()){
         throw 'Unauthorized';
     }
     await checkPasswords(req.body.password, req.body.confirmPassword);
