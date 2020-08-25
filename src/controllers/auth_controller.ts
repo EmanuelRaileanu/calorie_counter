@@ -15,11 +15,11 @@ export const login = async (req: express.Request, res: express.Response) => {
 };
 
 export const logout = async (req: any, res: express.Response) => {
-    await db.destroyBearerToken(req.user.bearerToken);
+    await db.destroyBearerToken(req.user?.bearerToken);
     res.json('Logged out successfully!');
 };
 
-export const resetPassword = async (req: any, res: express.Response) => {
+export const resetPassword = async (req: express.Request, res: express.Response) => {
     await handler.handlePasswordResetExceptions(req);
     await db.sendPasswordResetEmail(req.params.email);
     res.json('Password reset link sent. Please check your email.');

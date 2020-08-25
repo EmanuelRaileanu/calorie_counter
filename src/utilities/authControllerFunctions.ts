@@ -1,3 +1,4 @@
+import express from 'express';
 import User from '../entities/usersModel';
 import * as type from './customTypes';
 import bookshelf from './bookshelfConfig';
@@ -44,12 +45,12 @@ export async function sendPasswordResetEmail(email: string){
     });
 };
 
-export async function changePassword(req: any){
+export async function changePassword(req: express.Request){
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
     if(req.query.passwordResetToken){
         await new User().where({passwordResetToken: req.query.passwordResetToken}).save({password: hashedPassword, passwordResetToken: null}, {method: 'update'});
     }else{
-        await new User().where({bearerToken: req.user.bearerToken}).save({password: hashedPassword, passwordResetToken: null}, {method: 'update'});
+        await new User().where({bearerToken: req.headers.authorization?.split(' ')[1]}).save({password: hashedPassword, passwordResetToken: null}, {method: 'update'});
     }
 };
