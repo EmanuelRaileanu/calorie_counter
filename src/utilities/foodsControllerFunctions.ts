@@ -12,23 +12,27 @@ import User from '../entities/usersModel';
 
 const deleteFile = util.promisify(fs.unlink);
 
-export async function fetchFoods(req: express.Request){
+async function getPagination(req: express.Request){
     const reg = /^[0-9]+/;
     const length = parseInt(String(await new Food().length));
     const page = parseInt(reg.test(String(req.query.page))? String(req.query.page) : '1') || 1;
     const pageSize = parseInt(reg.test(String(req.query.pageSize))? String(req.query.pageSize) : '10') || 10;
     const pageCount = Math.ceil(length / pageSize);
-    const foods = await new Food().fetchPage({
-        require: false, 
-        page,
-        pageSize,
-        withRelated: ['categories', 'producedIn', 'producedBy', 'picture']
-    });
-    const pagination = {
+    return{
         page,
         pageSize,
         pageCount
     };
+};
+
+export async function fetchFoods(req: express.Request){
+    const pagination = await getPagination(req);
+    const foods = await new Food().fetchPage({
+        require: false, 
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+        withRelated: ['categories', 'producedIn', 'producedBy', 'picture']
+    });
     return{
         foods,
         pagination
@@ -47,24 +51,10 @@ export async function fetchFoodCategories(){
 };
 
 export async function fetchFoodByName(req: express.Request){
-    const reg = /^[0-9]+/;
-    const length = parseInt(String(await new Food().length));
-    const page = parseInt(reg.test(String(req.query.page))? String(req.query.page) : '1') || 1;
-    const pageSize = parseInt(reg.test(String(req.query.pageSize))? String(req.query.pageSize) : '10') || 10;
-    const pageCount = Math.ceil(length / pageSize);
-    const foods = await new Food().where('name', 'regexp', `(^| )${req.params.name}`).fetchAll({
+    return await new Food().where('name', 'regexp', `(^| )${req.params.name}`).fetchAll({
         require: false,
         withRelated: ['categories', 'producedIn', 'producedBy', 'picture']
     });
-    const pagination = {
-        page,
-        pageSize,
-        pageCount
-    };
-    return{
-        foods,
-        pagination
-    };
 };
 
 async function restructureBody(body: type.Food, trx: any = null){
