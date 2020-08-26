@@ -12,11 +12,27 @@ import User from '../entities/usersModel';
 
 const deleteFile = util.promisify(fs.unlink);
 
-export async function fetchFoods(){
-    return await new Food().fetchAll({
+export async function fetchFoods(req: express.Request){
+    const reg = /^[0-9]+/;
+    const length = parseInt(String(await new Food().length));
+    const page = parseInt(reg.test(String(req.query.page))? String(req.query.page) : '1') || 1;
+    const pageSize = parseInt(reg.test(String(req.query.pageSize))? String(req.query.pageSize) : '10') || 10;
+    const pageCount = Math.ceil(length / pageSize);
+    const foods = await new Food().fetchPage({
         require: false, 
+        page,
+        pageSize,
         withRelated: ['categories', 'producedIn', 'producedBy', 'picture']
     });
+    const pagination = {
+        page,
+        pageSize,
+        pageCount
+    };
+    return{
+        foods,
+        pagination
+    };
 };
 
 export async function fetchFoodById(id: number){
@@ -30,11 +46,25 @@ export async function fetchFoodCategories(){
     return await new FoodCategory().fetchAll({require: false});
 };
 
-export async function fetchFoodByName(name: string){
-    return await new Food({name}).fetch({
+export async function fetchFoodByName(req: express.Request){
+    const reg = /^[0-9]+/;
+    const length = parseInt(String(await new Food().length));
+    const page = parseInt(reg.test(String(req.query.page))? String(req.query.page) : '1') || 1;
+    const pageSize = parseInt(reg.test(String(req.query.pageSize))? String(req.query.pageSize) : '10') || 10;
+    const pageCount = Math.ceil(length / pageSize);
+    const foods = await new Food().where('name', 'regexp', `(^| )${req.params.name}`).fetchAll({
         require: false,
         withRelated: ['categories', 'producedIn', 'producedBy', 'picture']
     });
+    const pagination = {
+        page,
+        pageSize,
+        pageCount
+    };
+    return{
+        foods,
+        pagination
+    };
 };
 
 async function restructureBody(body: type.Food, trx: any = null){

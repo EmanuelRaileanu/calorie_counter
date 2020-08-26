@@ -10,7 +10,7 @@ import bcrypt from 'bcrypt';
 
 const deleteFile = util.promisify(fs.unlink);
 
-export async function handleGettingFoodByNameExceptions(item: type.Food){
+export async function handleGettingFoodByIdExceptions(item: type.Food){
     if(!item){
         throw 'Food item not found.';
     }

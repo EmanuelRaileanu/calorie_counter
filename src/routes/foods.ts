@@ -7,6 +7,7 @@ export const register = (router: express.Router) => {
     router.get('/foods', asyncMiddleware(controller.getFoods));
     router.get('/foods/food-categories', asyncMiddleware(controller.getFoodCategories));
     router.get('/profile', asyncMiddleware(controller.getUserProfile));
+    router.get('/foods/:id([0-9]+)', asyncMiddleware(controller.getFoodById));
     router.get('/foods/:name', asyncMiddleware(controller.getFoodByName));
     router.post('/foods/user-foods', asyncMiddleware(controller.addUserRelatedFoods));
     router.post('/foods', upload.single('foodPicture'), asyncMiddleware(controller.postFood));

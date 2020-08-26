@@ -3,7 +3,7 @@ import * as db from '../utilities/foodsControllerFunctions';
 import * as handler from '../utilities/exceptionHandlers';
 
 export const getFoods = async (req: express.Request, res: express.Response) => {
-    const foods = await db.fetchFoods();
+    const foods = await db.fetchFoods(req);
     res.json(foods);
 };
 
@@ -16,9 +16,14 @@ export const getUserProfile = async (req: any, res: express.Response) => {
     res.json(req.user);
 };
 
+export const getFoodById = async (req: any, res: express.Response) => {
+    const food = await db.fetchFoodById(req.params.id);
+    await handler.handleGettingFoodByIdExceptions(food);
+    res.json(food);
+};
+
 export const getFoodByName = async (req: express.Request, res: express.Response) => {
-    const food = await db.fetchFoodByName(req.params.name);
-    await handler.handleGettingFoodByNameExceptions(food);
+    const food = await db.fetchFoodByName(req);
     res.json(food);
 };
 
