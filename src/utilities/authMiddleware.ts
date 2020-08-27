@@ -9,10 +9,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const configurePassportHttpBearer = () => passport.use(new Bearer.Strategy(
-    async (token: string, done: (x: null, data: type.User | boolean, object?: { scope: string }) => type.User | void) => {
+    async (token: string, done: (x: any, data: type.User | boolean, object?: { scope: string }) => type.User | void) => {
         let user = (await new User({bearerToken: token}).fetch({require: false, withRelated: ['foods']}))?.toJSON();
         if (!user){ 
-            return done(null, false); 
+            return done(null, false);
         }
         delete user.password;
         if(user.foods){

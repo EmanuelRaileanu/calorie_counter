@@ -27,7 +27,9 @@ async function getPagination(req: express.Request){
 
 export async function fetchFoods(req: express.Request){
     const pagination = await getPagination(req);
-    const foods = await new Food().fetchPage({
+    const foods = await new Food().query(q => {
+        q.orderBy('name');
+    }).fetchPage({
         require: false, 
         page: pagination.page,
         pageSize: pagination.pageSize,
@@ -51,7 +53,10 @@ export async function fetchFoodCategories(){
 };
 
 export async function fetchFoodByName(req: express.Request){
-    return await new Food().where('name', 'regexp', `(^| )${req.params.name}`).fetchAll({
+    return await new Food().query(q => {
+        q.where('name', 'regexp', `(^| )${req.params.name}`);
+        q.orderBy('name');
+    }).fetchAll({
         require: false,
         withRelated: ['categories', 'producedIn', 'producedBy', 'picture']
     });
