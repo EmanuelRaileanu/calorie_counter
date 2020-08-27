@@ -16,7 +16,8 @@ export async function saveUser(body: type.User){
         email: body.email,
         password: hashedPassword,
         name: body.name,
-        dateOfBirth: body.dateOfBirth
+        dateOfBirth: body.dateOfBirth,
+        googleAccount: false
     };
     await new User(newUser).save();
 };

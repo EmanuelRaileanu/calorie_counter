@@ -58,7 +58,6 @@ export async function fetchFoodByName(req: express.Request){
 };
 
 async function restructureBody(body: type.Food, trx: any = null){
-    const restructuredBody = body;
     if(!body.productionCompanyId && body.productionCompany){
         body.productionCompanyId = await new ProductionCompany({name: body.productionCompany}).getId(trx);
         delete body.productionCompany;
@@ -67,7 +66,7 @@ async function restructureBody(body: type.Food, trx: any = null){
         body.countryId = await new Country({name: body.country}).getId(trx);
         delete body.country;
     }
-    return restructuredBody;
+    return body;
 };
 
 async function saveFoodPicture(req: express.Request, trx: any){

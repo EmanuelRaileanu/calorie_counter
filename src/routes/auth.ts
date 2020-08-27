@@ -9,4 +9,6 @@ export const register = async (router: express.Router) => {
     router.post('/logout', passport.authenticate('bearer', {session: false}), asyncMiddleware(controller.logout));
     router.post('/change-password', asyncMiddleware(controller.changePassword));
     router.post('/reset-password/:email', asyncMiddleware(controller.resetPassword));
+    router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
+    router.get('/google/callback', passport.authenticate('google', { session: false }), (req, res) => res.json(req.user));
 };
