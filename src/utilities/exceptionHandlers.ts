@@ -126,7 +126,9 @@ export async function handleLoginExceptions(req: express.Request){
     const user = await new User({email: req.body.email}).fetch({require: false});
     if(!req.body.password){
         throw 'Please enter your password.';
-    }else if(!await bcrypt.compare(req.body.password, user.get('password'))){
+    }else if(!user.get('password')){    
+        throw 'Invalid credentials.';
+    }else if(await bcrypt.compare(req.body.password, user.get('password'))){
         throw 'Incorrect password';
     }else if(user.get('bearerToken')){
         throw user.get('bearerToken');

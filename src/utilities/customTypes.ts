@@ -27,7 +27,8 @@ export interface User{
     dateOfBirth?: string,
     confirmPassword?: string,
     bearerToken?: string,
-    passwordResetToken?: string
+    passwordResetToken?: string,
+    googleAccount: boolean
 };
 
 export interface Food{
