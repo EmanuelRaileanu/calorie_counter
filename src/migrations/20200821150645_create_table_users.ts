@@ -9,6 +9,8 @@ export async function up(knex: Knex): Promise<void> {
         table.date('dateOfBirth');
         table.string('bearerToken');
         table.string('passwordResetToken');
+        table.string('confirmationToken');
+        table.boolean('isConfirmed').defaultTo(false);
         table.timestamp('createdAt').defaultTo(knex.fn.now());
     });
 

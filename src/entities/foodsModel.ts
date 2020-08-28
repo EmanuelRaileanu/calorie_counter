@@ -6,7 +6,6 @@ import File from './filesModel';
 import User from './usersModel';
 
 class Food extends BaseModel{
-    [x: string]: any;
     get tableName(){
         return 'foods';
     }

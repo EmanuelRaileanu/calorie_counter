@@ -7,6 +7,7 @@ import util from 'util';
 import fs from 'fs';
 import * as type from './customTypes';
 import bcrypt from 'bcrypt';
+import { use } from 'passport';
 
 const deleteFile = util.promisify(fs.unlink);
 
@@ -124,11 +125,13 @@ export async function handleRegisterExceptions(req: express.Request){
 export async function handleLoginExceptions(req: express.Request){
     await checkEmail(req.body.email);
     const user = await new User({email: req.body.email}).fetch({require: false});
-    if(!req.body.password){
+    if(!user.get('isConfirmed')){
+        throw 'Please confirm your account first!';
+    }else if(!req.body.password){
         throw 'Please enter your password.';
     }else if(!user.get('password')){    
         throw 'Invalid credentials.';
-    }else if(await bcrypt.compare(req.body.password, user.get('password'))){
+    }else if(!await bcrypt.compare(req.body.password, user.get('password'))){
         throw 'Incorrect password';
     }else if(user.get('bearerToken')){
         throw user.get('bearerToken');
@@ -138,6 +141,22 @@ export async function handleLoginExceptions(req: express.Request){
 export async function handleAddingUserRelatedFoodsExceptions(req: express.Request){
     if(!req.body.foods){
         throw 'Bad request. Please enter the foods you would like to add to the list.';
+    }
+};
+
+export async function handleResendingConfirmationEmailExceptions(req: express.Request){
+    checkEmail(req.body.email);
+    const user = await new User({email: req.body.email}).fetch({require: false});
+    if(!user){
+        throw 'Incorrect email.';
+    }else if(!user.get('confirmationToken')){
+        throw 'This account has already been confirmed.';
+    }
+};
+
+export async function handleAccountConfirmationExceptions(req: express.Request){
+    if(!await new User({confirmationToken: req.query.confirmationToken}).checkIfAlreadyExists()){
+        throw 'The account does not exist or has already been confirmed.';
     }
 };
 

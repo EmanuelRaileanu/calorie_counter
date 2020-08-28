@@ -5,7 +5,7 @@ import * as db from '../utilities/authControllerFunctions';
 export const register = async (req: express.Request, res: express.Response) => {
     await handler.handleRegisterExceptions(req);
     await db.saveUser(req.body);
-    res.json('Registerd successfully!');
+    res.json(`A confirmation email has been sent to ${req.body.email}. Please confirm your account.`);
 };
 
 export const login = async (req: express.Request, res: express.Response) => {
@@ -17,6 +17,18 @@ export const login = async (req: express.Request, res: express.Response) => {
 export const logout = async (req: any, res: express.Response) => {
     await db.destroyBearerToken(req.user?.bearerToken);
     res.json('Logged out successfully!');
+};
+
+export const resendConfirmationEmail = async (req: express.Request, res: express.Response) => {
+    await handler.handleResendingConfirmationEmailExceptions(req);
+    await db.resendConfirmationEmail(req);
+    res.json(res.json(`A confirmation email has been sent to ${req.body.email}. Please confirm your account.`));
+};
+
+export const confirmAccount = async (req: any, res: express.Response) => {
+    await handler.handleAccountConfirmationExceptions(req);
+    await db.confirmAccount(req);
+    res.json('Account confirmed!');
 };
 
 export const resetPassword = async (req: express.Request, res: express.Response) => {
