@@ -27,9 +27,7 @@ async function getPagination(req: express.Request){
 
 export async function fetchFoods(req: express.Request){
     const pagination = await getPagination(req);
-    const foods = await new Food().query(q => {
-        q.orderBy('name');
-    }).fetchPage({
+    const foods = await new Food().orderBy('name').fetchPage({
         require: false, 
         page: pagination.page,
         pageSize: pagination.pageSize,

@@ -47,7 +47,8 @@ export const configurePassportGoogleOAuth = () => passport.use(new GoogleStrateg
             const newUser = {
                 email: profile._json.email,
                 name: profile._json.name,
-                bearerToken: accessToken
+                bearerToken: accessToken,
+                isConfirmed: profile._json.email_verified
             };
             await new User().save(newUser, {method: 'insert'});
             return done(null, newUser, { scope: 'all' });
