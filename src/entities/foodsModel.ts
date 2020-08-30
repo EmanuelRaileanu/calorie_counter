@@ -5,7 +5,7 @@ import ProductionCompany from './productionCompaniesModel';
 import File from './filesModel';
 import User from './usersModel';
 
-class Food extends BaseModel{
+export default class Food extends BaseModel{
     get tableName(){
         return 'foods';
     }
@@ -34,5 +34,3 @@ class Food extends BaseModel{
         return this.belongsToMany(User, 'users_foods', 'foodId', 'userId');
     }
 };
-
-export default Food;

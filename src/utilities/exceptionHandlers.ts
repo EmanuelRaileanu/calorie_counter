@@ -7,9 +7,28 @@ import util from 'util';
 import fs from 'fs';
 import * as type from './customTypes';
 import bcrypt from 'bcrypt';
-import { use } from 'passport';
 
 const deleteFile = util.promisify(fs.unlink);
+
+async function checkEmail(email: string){
+    if(!email){
+        throw 'Please enter your email.';
+    }else if(!email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)){
+        throw 'Invalid email format. Example format: emailaddress@gmail.com';
+    }
+};
+
+async function checkPasswords(password: string, confirmPassword: string){
+    if(!password){
+        throw 'Please enter your password.';
+    }else if(!confirmPassword){
+        throw 'Please confirm your password.';
+    }else if(password.length < 6){
+        throw 'The password should be at least 6 characters long.';
+    }else if(password !== confirmPassword){
+        throw 'Passwords do not match.';
+    }
+};
 
 export async function handleGettingFoodByIdExceptions(item: type.Food){
     if(!item){
@@ -87,26 +106,6 @@ export async function handleProductionCompanyDeletionExceptions(req: express.Req
     }
 };
 
-async function checkEmail(email: string){
-    if(!email){
-        throw 'Please enter your email.';
-    }else if(!email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)){
-        throw 'Invalid email format. Example format: emailaddress@gmail.com';
-    }
-};
-
-async function checkPasswords(password: string, confirmPassword: string){
-    if(!password){
-        throw 'Please enter your password.';
-    }else if(!confirmPassword){
-        throw 'Please confirm your password.';
-    }else if(password.length < 6){
-        throw 'The password should be at least 6 characters long.';
-    }else if(password !== confirmPassword){
-        throw 'Passwords do not match.';
-    }
-};
-
 export async function handleRegisterExceptions(req: express.Request){
     await checkEmail(req.body.email);
     if(await new User({email: req.body.email}).checkIfAlreadyExists()){
@@ -161,8 +160,8 @@ export async function handleAccountConfirmationExceptions(req: express.Request){
 };
 
 export async function handlePasswordResetExceptions(req: express.Request){
-    await checkEmail(req.params.email);
-    if(!await new User({email: req.params.email}).checkIfAlreadyExists()){
+    await checkEmail(req.body.email);
+    if(!await new User({email: req.body.email}).checkIfAlreadyExists()){
         throw 'Incorrect email address.';
     }
 };
