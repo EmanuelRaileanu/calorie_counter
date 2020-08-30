@@ -21,7 +21,7 @@ export const logout = async (req: any, res: express.Response) => {
 
 export const resendConfirmationEmail = async (req: express.Request, res: express.Response) => {
     await handler.handleResendingConfirmationEmailExceptions(req);
-    await db.resendConfirmationEmail(req);
+    await db.resendConfirmationEmail(req.body.email);
     res.json(res.json(`A confirmation email has been sent to ${req.body.email}. Please confirm your account.`));
 };
 
@@ -33,7 +33,7 @@ export const confirmAccount = async (req: any, res: express.Response) => {
 
 export const resetPassword = async (req: express.Request, res: express.Response) => {
     await handler.handlePasswordResetExceptions(req);
-    await db.sendPasswordResetEmail(req.params.email);
+    await db.sendPasswordResetEmail(req.body.email);
     res.json('Password reset link sent. Please check your email.');
 };
 

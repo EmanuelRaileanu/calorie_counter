@@ -2,7 +2,7 @@ import BaseModel from './baseModel';
 import Food from './foodsModel';
 import absoluteUrl from '../utilities/absoluteUrlConfig';
 
-class File extends BaseModel{
+export default class File extends BaseModel{
     get tableName(){
         return 'files';
     }
@@ -17,5 +17,3 @@ class File extends BaseModel{
         }
     }
 };
-
-export default File;

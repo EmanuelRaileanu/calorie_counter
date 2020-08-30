@@ -1,7 +1,7 @@
 import BaseModel from './baseModel';
 import Food from './foodsModel';
 
-class User extends BaseModel{
+export default class User extends BaseModel{
     get tableName(){
         return 'users';
     }
@@ -10,5 +10,3 @@ class User extends BaseModel{
         return this.belongsToMany(Food, 'users_foods', 'userId', 'foodId');
     }
 };
-
-export default User;

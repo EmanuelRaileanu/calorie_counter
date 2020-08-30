@@ -2,7 +2,7 @@ import BaseModel from './baseModel';
 import ProductionCompany from './productionCompaniesModel';
 import Food from './foodsModel';
 
-class Country extends BaseModel{
+export default class Country extends BaseModel{
     get tableName(){
         return 'countries';
     }
@@ -15,5 +15,3 @@ class Country extends BaseModel{
         return this.belongsToMany(ProductionCompany, 'production_companies_countries', 'countryId', 'productionCompanyId');
     }
 };
-
-export default Country;

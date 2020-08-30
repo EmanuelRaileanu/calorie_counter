@@ -1,6 +1,6 @@
 import bookshelf from '../utilities/bookshelfConfig';
 
-class BaseModel extends bookshelf.Model<any>{
+export default class BaseModel extends bookshelf.Model<any>{
     checkIfAlreadyExists(trx: any = null){
         return this.fetch({require: false, transacting: trx});
     }
@@ -13,5 +13,3 @@ class BaseModel extends bookshelf.Model<any>{
         return null;
     }
 };
-
-export default BaseModel;

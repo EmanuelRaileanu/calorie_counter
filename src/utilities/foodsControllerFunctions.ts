@@ -25,6 +25,70 @@ async function getPagination(req: express.Request){
     };
 };
 
+async function restructureBody(body: type.Food, trx: any = null){
+    if(!body.productionCompanyId && body.productionCompany){
+        body.productionCompanyId = await new ProductionCompany({name: body.productionCompany}).getId(trx);
+        delete body.productionCompany;
+    }
+    if(!body.countryId && body.country){
+        body.countryId = await new Country({name: body.country}).getId(trx);
+        delete body.country;
+    }
+    return body;
+};
+
+async function saveFoodPicture(req: express.Request, trx: any){
+    const file = {
+        originalFileName: req.file.originalname,
+        mimeType: req.file.mimetype,
+        relativePath: req.file.path,
+        size: req.file.size,
+        fileName: req.file.filename
+    };
+    return await new File().save(file, {transacting: trx, method: 'insert'});
+};
+
+async function saveFoodPictureIfItExistsAndReturnId(req: express.Request, trx: any){
+    if(req.file){
+        return (await saveFoodPicture(req, trx)).get('id');
+    }
+    return null;
+};
+
+async function deleteOldFile(id: number, oldPhotoPath: string, trx: any){
+    await new File().where({id}).destroy({transacting: trx});
+    await deleteFile(oldPhotoPath);
+};
+
+async function updateFoodPictureIfItExistsAndReturnId(req: express.Request, trx: any){
+    if(req.file){
+        const currentFoodItem = await new Food({id: req.params.id}).fetch({require: false, transacting: trx});
+        const oldPictureId = currentFoodItem.get('pictureId');
+        const oldPhotoPath = (await new File({id: oldPictureId}).fetch({require: false, transacting: trx})).get('relativePath');
+        if(oldPhotoPath){
+            await currentFoodItem.save({pictureId: null}, {transacting: trx, method: 'update'});
+            await deleteOldFile(oldPictureId, oldPhotoPath, trx);
+        }
+        return await saveFoodPictureIfItExistsAndReturnId(req, trx);
+    }
+    return null;
+};
+
+async function getUserRelatedFoodsIds(userId: number, trx: any){
+    const user = await new User({id: userId}).fetch({require: false, transacting: trx, withRelated:['foods']})
+    const foodsIds = user.related('foods').toJSON().map((food: any) => food.id);
+    return foodsIds;
+};
+
+async function checkIfUserFoodAlreadyExists(food: any, trx: any){
+    const user = await new User({id: food.userId}).fetch({require: false, transacting: trx, withRelated: ['foods']});
+    const foodsIds = user.related('foods').map((food: any) => food.id);
+    if(foodsIds.find((foodId: any) => foodId === food.foodId)){
+        return true;
+    }
+    return false;
+};
+
 export async function fetchFoods(req: express.Request){
     const pagination = await getPagination(req);
     const foods = await new Food().orderBy('name').fetchPage({
@@ -60,55 +124,6 @@ export async function fetchFoodByName(req: express.Request){
     });
 };
 
-async function restructureBody(body: type.Food, trx: any = null){
-    if(!body.productionCompanyId && body.productionCompany){
-        body.productionCompanyId = await new ProductionCompany({name: body.productionCompany}).getId(trx);
-        delete body.productionCompany;
-    }
-    if(!body.countryId && body.country){
-        body.countryId = await new Country({name: body.country}).getId(trx);
-        delete body.country;
-    }
-    return body;
-};
-
-async function saveFoodPicture(req: express.Request, trx: any){
-    const file = {
-        originalFileName: req.file.originalname,
-        mimeType: req.file.mimetype,
-        relativePath: req.file.path,
-        size: req.file.size,
-        fileName: req.file.filename
-    };
-    return await new File().save(file, {transacting: trx, method: 'insert'});
-};
-
-async function saveFoodPictureIfItExistsAndReturnId(req: express.Request, trx: any){
-    if(req.file){
-        return (await saveFoodPicture(req, trx)).get('id');
-    }
-    return null;
-};
-
-async function deleteOldFile(id: number, oldPhotoPath: string, trx: any){
-    await new File().where({id}).destroy({transacting: trx});
-    await deleteFile(oldPhotoPath);
-}
-
-async function updateFoodPictureIfItExistsAndReturnId(req: express.Request, trx: any){
-    if(req.file){
-        const currentFoodItem = await new Food({id: req.params.id}).fetch({require: false, transacting: trx});
-        const oldPictureId = currentFoodItem.get('pictureId');
-        const oldPhotoPath = (await new File({id: oldPictureId}).fetch({require: false, transacting: trx})).get('relativePath');
-        if(oldPhotoPath){
-            await currentFoodItem.save({pictureId: null}, {transacting: trx, method: 'update'});
-            await deleteOldFile(oldPictureId, oldPhotoPath, trx);
-        }
-        return await saveFoodPictureIfItExistsAndReturnId(req, trx);
-    }
-    return null;
-}
-
 export async function saveFoodItem(req: express.Request){
     return await bookshelf.transaction(async trx => {
         const body = await restructureBody(req.body, trx);
@@ -124,21 +139,6 @@ export async function saveFoodItem(req: express.Request){
         }
         return id;
     });
-};
-
-async function getUserRelatedFoodsIds(userId: number, trx: any){
-    const user = await new User({id: userId}).fetch({require: false, transacting: trx, withRelated:['foods']})
-    const foodsIds = user.related('foods').toJSON().map((food: any) => food.id);
-    return foodsIds;
-};
-
-async function checkIfUserFoodAlreadyExists(food: any, trx: any){
-    const user = await new User({id: food.userId}).fetch({require: false, transacting: trx, withRelated: ['foods']});
-    const foodsIds = user.related('foods').map((food: any) => food.id);
-    if(foodsIds.find((foodId: any) => foodId === food.foodId)){
-        return true;
-    }
-    return false;
 };
 
 export async function attachUserFoods(req: any){

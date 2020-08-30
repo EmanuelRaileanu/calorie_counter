@@ -46,8 +46,7 @@ export async function destroyBearerToken(bearerToken: string){
     await new User().where({bearerToken}).save({bearerToken: null}, {method: 'update'});
 };
 
-export async function resendConfirmationEmail(req: express.Request){
-    const email = req.body.email;
+export async function resendConfirmationEmail(email: string){
     const confirmationToken = (await new User({email}).fetch({require: false})).get('confirmationToken');
     await sendConfirmationEmail(email, confirmationToken);
 };
